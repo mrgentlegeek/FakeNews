@@ -1,0 +1,107 @@
+﻿@model FakeNews.web.Models.ViewModels.RegisterViewModel
+@{
+}
+
+<div class="container mx-auto">
+	<div class="row justify-content-center">
+		<div class="col-12 col-lg-6">
+			<h1 class="my-3 h-3">
+				Register
+			</h1>
+			<div class="mb-3 text-danger d-none" id="errorContainer">
+				<ul id="errorUl">
+
+				</ul>
+			</div>
+			<form method="post" id="form">
+				<div class="mb-3 ">
+					<label class="form-label">Username</label>
+					<input type="text" id="username" class="form-control" asp-for="Username" required/>
+					<span class="text-danger" asp-validation-for="Username"></span>
+				</div>			
+
+				<div class="mb-3 ">
+					<label class="form-label">Email</label>
+					<input type="email" id="email" class="form-control" asp-for="Email" required/>
+					<span class="text-danger" asp-validation-for="Email"></span>
+				</div>		
+			
+				<div class="mb-3 ">
+					<label class="form-label">Password</label>
+					<input type="password" id="password" class="form-control" asp-for="Password" required minlength="6"/>
+					<span class="text-danger" asp-validation-for="Password"></span>
+				</div>
+
+				<div class="mb-3">
+					<button class="btn btn-dark" id="submitBtn" type="button">Register</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts{
+	<script>
+
+		function validatePassword(password) {
+			const requirements = {
+				RequireDigit: true,
+				RequireLowercase: true,
+				RequireUppercase: true,
+				RequireNonAlphanumeric: true,
+				RequiredLength: 6,
+				RequiredUniqueChars: 1,
+			};
+
+			let errors = [];
+
+			if (requirements.RequireDigit && !/\d/.test(password)) {
+				errors.push("Password must contain at least one digit.");
+			}
+
+			if (requirements.RequireLowercase && !/[a-z]/.test(password)) {
+				errors.push("Password must contain at least one lowercase letter.");
+			}
+
+			if (requirements.RequireUppercase && !/[A-Z]/.test(password)) {
+				errors.push("Password must contain at least one uppercase letter.");
+			}
+
+			if (requirements.RequireNonAlphanumeric && !/[^a-zA-Z0-9]/.test(password)) {
+				errors.push("Password must contain at least one non-alphanumeric character.");
+			}
+
+			if (password.length < requirements.RequiredLength) {
+				errors.push(`Password must be at least ${requirements.RequiredLength} characters long.`);
+			}
+
+			const uniqueChars = new Set(password).size;
+			if (uniqueChars < requirements.RequiredUniqueChars) {
+				errors.push(`Password must contain at least ${requirements.RequiredUniqueChars} unique characters.`);
+			}
+
+			return  errors;
+		}
+
+		$("#submitBtn").click(function () {
+			$("#form").submit()
+			// const password = $("#password").val()
+			// const errors = validatepassword(password);
+
+			// $("#errorul").empty();
+
+			// if (errors.length === 0) {
+			// 	$("#form").submit()
+
+			// }else{
+			// 	errors.map((result) => {
+			// 		var newitem = $("<li></li>").text(result);  
+			// 		$("#errorul").append(newitem);
+			// 	})
+
+			// 	$("#errorcontainer").removeclass("d-none")
+			// }
+		})
+	</script>
+}

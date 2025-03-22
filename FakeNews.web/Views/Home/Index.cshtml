@@ -1,0 +1,77 @@
+﻿
+@{
+    ViewData["Title"] = "Home Page";
+}
+@model FakeNews.web.Models.ViewModels.HomeViewModel
+
+<div class="container col-xxl-8 px-4 py-5">
+    <div class="row align-items-center g-5 py-5 flex-row-reverse">
+        <div class="col-12 col-lg-6" style="display:flex; justify-content:end">
+            <img src="https://images.pexels.com/photos/4160067/pexels-photo-4160067.jpeg?auto=compress&cs=tinysrgb&w=400" alt="FakeNews - Hero"
+                 class="d-block ml-auto col-12 col-md-12 col-lg-auto img-fluid" />
+        </div>
+        <div class="col-12 col-lg-6">
+            <h1 class="display-5 fw-bold lh-1 mb-3">FakeNews - Dev Blog</h1>
+            <p class="lead"> Because we all know that the internet never lies. 
+                Welcome to FakeNews, your go-to source for the most "accurate" tech news. 
+                Rest assured, every post here is triple-checked by our elite squad of truth-seeking unicorns. 
+                You're in safe hands!</p>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-3">
+    <div class="row justify-content-center">
+        <div class="col-12 d-flex flex-wrap justify-content-center">
+            @if(Model != null && Model.Tags.Any())
+            {
+                foreach( var tag in Model.Tags)
+                {
+                   <span class="badge bg-dark me-1 p-3">@tag.Name</span>
+                }
+            }
+        </div>
+    </div>
+
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 d-flex flex-wrap justify-content-center">
+            @if (Model != null && Model.BlogPosts.Any())
+            {
+                foreach (var blogPost in Model.BlogPosts)
+                {
+                    <div class="mb-5 bg-light box-shadow col-12 col-md-5 mx-2">
+                        <img src="@blogPost.FeaturedImageUrl" alt="@blogPost.Heading" class="mb-2 d-block img-fluid" />
+                        <div class="px-3">
+                            <h2 class="mb-3"> @blogPost.Heading</h2>
+
+                            <p class="mb-2"> Author:@blogPost.Author
+                                <br />
+                                Published Date: @blogPost.PublishedDate.ToShortDateString()
+                            </p>
+
+                            <p class="mb-3">
+                                @foreach (var tag in blogPost.Tags)
+                                {
+                                    <span class="badge bg-secondary me-1">@tag.Name</span>
+                                }
+                            </p>
+
+                            <p>@blogPost.ShortDescription 
+                                <a class="mx-2 fw-bold" 
+                                asp-area="" 
+                                asp-controller="Blogs" 
+                                asp-action="Index"
+                                asp-route-urlHandle="@blogPost.UrlHandle"
+                                >Read More</a>
+                            </p>
+                        </div>
+
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

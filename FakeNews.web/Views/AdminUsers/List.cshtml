@@ -1,0 +1,158 @@
+﻿@model List<FakeNews.web.Models.ViewModels.UserViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> signInManager;
+
+@{
+}
+
+<div class="bg-secondary bg-opacity-10 py-2">
+	<div class="container">
+		<h1>Users</h1>
+	</div>
+
+</div>
+
+<!-- Modal -->
+<div class="container py-3">
+		<div class="mb-3 d-flex justify-content-end">
+			<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createUserModal">
+				Create User
+			</button>
+		</div>		
+
+	@if (Model != null && Model.Any())
+	{
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Username</th>
+					<th>Email</th>
+					<th>Role</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var user in Model)
+				{
+					<tr>
+						<td>@user.Id</td>
+						<td>@user.UserName</td>
+						<td>@user.Email</td>
+						<td>
+							<span class="badge @(user.Role == "Admin" ? "bg-danger" : "bg-secondary") me-1">@user.Role</span>
+						</td>
+						<td class="text-danger" style="cursor:pointer" onclick="deleteUser('@user.Id')">Delete</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<tr>
+			<td>No user found! Please Create a User</td>
+		</tr>
+	}
+</div>
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="createUserModalLabel">Create New User</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label class="form-label">Username</label>
+					<input id="usernameField" type="text" class="form-control" />
+				</div>				
+				<div class="mb-3">
+					<label class="form-label">Email</label>
+					<input id="emailField" type="email" class="form-control" />
+				</div>			
+				<div class="mb-3">
+					<label class="form-label">Password</label>
+					<input id="passwordField" type="password" class="form-control" />
+				</div>
+				<div class="mb-3">
+					<div class="form-check">
+						<input type="checkbox" id="userRoleCheck" class="form-check-input" value="User" checked disabled />
+						<label class="form-label" for="userRoleCheck">User Role</label>
+					</div>
+					@if (signInManager.IsSignedIn(User) && User.IsInRole("SuperAdmin"))
+					{
+						<div class="form-check">
+							<input type="checkbox" id="adminRoleCheck" class="form-check-input" value="Admin" />
+							<label class="form-label" for="adminRoleCheck">Admin Role</label>
+						</div>
+					}
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button id="addUserButton" type="button" class="btn btn-primary">Add</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		const usernameFieldElement = document.getElementById("usernameField");
+		const emailFieldElement = document.getElementById("emailField");
+		const passwordFieldElement = document.getElementById("passwordField");
+		const adminRoleCheckElement = document.getElementById("adminRoleCheck");
+		const addUserButtonElement = document.getElementById("addUserButton");
+		const createUserModalElement = document.getElementById("createUserModal")
+
+
+		async function addUser() {
+			try {
+				const response = await fetch('/api/AdminManageUser/Add', {
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': '*/*'
+					},
+					body: JSON.stringify({
+						Username: usernameFieldElement.value,
+						Email: emailFieldElement.value,
+						Password: passwordFieldElement.value,
+						Role: adminRoleCheckElement?.checked ? adminRoleCheckElement.value : "User",
+					})
+				});
+
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				$("#createUserModal").modal('hide')
+				location.reload()
+
+			} catch (error) {
+				console.error('There was a problem with the fetch operation:', error);
+			}
+		}
+
+		async function deleteUser(id) {
+			try {
+				const response = await fetch(`/api/AdminManageUser/${id}/delete`, {
+					method: "DELETE",
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': '*/*'
+					},
+				})
+
+				location.reload()
+			} catch(error) {
+				console.log("ERROR", error)
+			}
+		}
+
+
+		if (addUserButtonElement) {
+			addUserButtonElement.addEventListener('click', addUser)
+		}
+	</script>
+}
